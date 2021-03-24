@@ -1,0 +1,10 @@
+﻿  main.c
+c:\users\colte\source\repos\big_texas_game\big_texas_game\main.c(178): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\source\repos\big_texas_game\big_texas_game\main.c(186): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\source\repos\big_texas_game\big_texas_game\main.c(199): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\source\repos\big_texas_game\big_texas_game\main.c(207): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\source\repos\big_texas_game\big_texas_game\main.c(258): warning C4244: '=': conversion from 'clock_t' to 'uint8_t', possible loss of data
+  Generating code
+  All 12 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  big_texas_game.vcxproj -> C:\Users\colte\source\repos\big_texas_game\x64\Release\big_texas_game.exe

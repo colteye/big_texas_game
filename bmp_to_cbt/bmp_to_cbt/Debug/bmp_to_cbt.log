@@ -1,0 +1,3 @@
+﻿  bmp_to_cbt.c
+c:\users\colte\source\repos\bmp_to_cbt\bmp_to_cbt\bmp_to_cbt.c(65): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'FILE *'
+  bmp_to_cbt.vcxproj -> C:\Users\colte\source\repos\bmp_to_cbt\Debug\bmp_to_cbt.exe
