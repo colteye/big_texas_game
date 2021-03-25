@@ -1,17 +1,22 @@
 ﻿  main.cpp
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(226): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(229): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(242): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(243): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(255): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(263): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(276): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(284): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(443): warning C4326: return type of 'main' should be 'int' instead of 'void'
-c:\users\colte\source\repos\big_texas_game\big_texas_game\main.cpp(479): warning C4244: '=': conversion from 'clock_t' to 'uint8_t', possible loss of data
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(231): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(234): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(247): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(248): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(260): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(268): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(281): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(289): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(465): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(476): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(488): warning C4838: conversion from 'int' to 'uint8_t' requires a narrowing conversion
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(582): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(609): warning C4554: '<<': check operator precedence for possible error; use parentheses to clarify precedence
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(615): warning C4326: return type of 'main' should be 'int' instead of 'void'
+c:\users\colte\documents\side_projects\big_texas_game\big_texas_game\big_texas_game\main.cpp(653): warning C4244: '=': conversion from 'clock_t' to 'uint8_t', possible loss of data
   Generating code
-  0 of 16 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  0 of 20 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  big_texas_game.vcxproj -> C:\Users\colte\source\repos\big_texas_game\Release\big_texas_game.exe
+  big_texas_game.vcxproj -> C:\Users\colte\Documents\Side_Projects\big_texas_game\big_texas_game\Release\big_texas_game.exe

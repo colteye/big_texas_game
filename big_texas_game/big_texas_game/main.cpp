@@ -12,10 +12,6 @@ using namespace Gdiplus;
 #pragma warning(disable:4996)
 #endif
 
-// NEXT STEP: BASIC DRAW COMMANDS, ANIMS.
-
-
-
 // 256 8x8 tiles for 128x128 screen.
 #define TILE_BYTE_SIZE 8
 #define BIT_PER_BYTE 8
@@ -161,7 +157,7 @@ void render_tick(void)
 	HDC src = CreateCompatibleDC(hdc); // hdc - Device context for window, I've got earlier with GetDC(hWnd) or GetDC(NULL);
 	SelectObject(src, map); // Inserting picture into our temp HDC
 	// Copy image from temp HDC to window
-	BitBlt(hdc, // Destination
+	/*BitBlt(hdc, // Destination
 		0,  // x and
 		0,  // y - upper-left corner of place, where we'd like to copy
 		128, // width of the region
@@ -169,7 +165,12 @@ void render_tick(void)
 		src, // source
 		0,   // x and
 		0,   // y of upper left corner  of part of the source, from where we'd like to copy
-		SRCCOPY); // Defined DWORD to juct copy pixels. Watch more on msdn;
+		SRCCOPY); // Defined DWORD to juct copy pixels. Watch more on msdn;*/
+
+	// Can stretch to any power of 2 square size.
+	SetStretchBltMode(hdc, COLORONCOLOR);
+	StretchBlt(hdc, 0, 0, 512, 512, src, 0, 0, 128, 128, SRCCOPY);
+
 
 	DeleteDC(src); // Deleting temp HDC
 }
@@ -318,7 +319,7 @@ uint8_t collide_within_bounds(struct player_t *player, struct u_bounds_t *bounds
 	//                       up down left right	
 	uint8_t collision_status = 0x00;
 
-	if (bounds->max.y > player->bounds.max.y)
+	if (bounds->max.y >= player->bounds.max.y)
 	{
 		uint8_t delta = bounds->max.y - player->bounds.max.y;
 		player->pos.y += delta;
@@ -329,7 +330,7 @@ uint8_t collide_within_bounds(struct player_t *player, struct u_bounds_t *bounds
 		collision_status |= BIT0;
 	}
 
-	if (bounds->min.y < player->bounds.min.y)
+	if (bounds->min.y <= player->bounds.min.y)
 	{
 		uint8_t delta = player->bounds.min.y - bounds->min.y;
 		player->pos.y -= delta;
@@ -340,7 +341,7 @@ uint8_t collide_within_bounds(struct player_t *player, struct u_bounds_t *bounds
 		collision_status |= BIT1;
 	}
 
-	if (bounds->min.x > player->bounds.min.x)
+	if (bounds->min.x >= player->bounds.min.x)
 	{
 		uint8_t delta = bounds->min.x - player->bounds.min.x;
 		player->pos.x += delta;
@@ -351,7 +352,7 @@ uint8_t collide_within_bounds(struct player_t *player, struct u_bounds_t *bounds
 		collision_status |= BIT2;
 	}
 
-	if (bounds->max.x < player->bounds.max.x)
+	if (bounds->max.x <= player->bounds.max.x)
 	{
 		uint8_t delta =  player->bounds.max.x - bounds->max.x;
 		player->pos.x -= delta;
@@ -429,12 +430,25 @@ void check_input(void)
 {
 	if (is_key_down(A_KEY))
 	{
-		scroll_scene_right(3);
+		if (player_col_stat & BIT2) vel.x = 0;
+		else vel.x = -2;
 	}
-	
-	if (is_key_down(D_KEY))
+	else if (is_key_down(D_KEY))
 	{
-		scroll_scene_left(3);
+		if (player.pos.x < 48)
+		{
+			vel.x = 2;
+			scroll_scene_left(2);
+		}	
+		else
+		{
+			vel.x = 0;
+			scroll_scene_left(3);
+		}
+	}
+	else
+	{
+		vel.x = 0;
 	}
 
 	if (is_key_down(SPACE_KEY))
@@ -443,14 +457,170 @@ void check_input(void)
 	}
 }
 
+void draw_text(u_vec2 pos, cbt_sprite *sprite, u_vec2 size, u_vec2 offset)
+{
+	for (int y = 0; y < size.y; ++y)
+	{
+		uint8_t prev_data = sprite->data[(y + offset.y) * (sprite->width / TILE_BYTE_SIZE) + (offset.x / TILE_BYTE_SIZE)];
+		uint8_t carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+
+		for (int x = 0; x < size.x / TILE_BYTE_SIZE; ++x)
+		{
+			prev_data = sprite->data[(y + offset.y) * (sprite->width / TILE_BYTE_SIZE) + x + (offset.x / TILE_BYTE_SIZE)];
+
+			uint8_t data = sprite->data[(y + offset.y) * (sprite->width / TILE_BYTE_SIZE) + x + (offset.x / TILE_BYTE_SIZE)] >> (pos.x % TILE_BYTE_SIZE) | carry_data;
+
+			render_buffer[(pos.y + y) * NUM_TILES + ((pos.x / TILE_BYTE_SIZE) + x)] &= ~data;
+			render_buffer[(pos.y + y) * NUM_TILES + ((pos.x / TILE_BYTE_SIZE) + x)] |= (0x00 & data);
+
+			carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+		}
+	}
+}
+
+struct cbt_sprite ui_text_sprite;
+
+void draw_str_internal(u_vec2 pos, char ch, u_vec2 char_offset)
+{
+	uint8_t n_char = ch - char_offset.x;
+
+	u_vec2 offset = { (n_char % 8) * 8,
+						((n_char / 8) + char_offset.y) * 8 };
+
+	draw_text({ pos.x , pos.y }, &ui_text_sprite, { 8, 8 }, offset);
+}
+
+void draw_str(u_vec2 pos, const char* str, size_t len)
+{
+	for (uint8_t i = 0; i < len; ++i)
+	{
+		u_vec2 char_offset = { 0, 0 };
+
+		switch (str[i]) {
+		case '!':
+			draw_text({ pos.x , pos.y }, &ui_text_sprite, { 8, 8 }, { 32, 32 });
+			break;
+		case '?':
+			draw_text({ pos.x , pos.y }, &ui_text_sprite, { 8, 8 }, { 40, 32 });
+			break;
+		case '.':
+			draw_text({ pos.x , pos.y }, &ui_text_sprite, { 8, 8 }, { 48, 32 });
+			break;
+		case ',':
+			draw_text({ pos.x , pos.y }, &ui_text_sprite, { 8, 8 }, { 56, 32 });
+			break;
+		default:
+			if (str[i] > 64 && str[i] < 91)
+			{
+				char_offset = { 65 - 2, 1 };
+				draw_str_internal(pos, str[i], char_offset);
+			}
+			else if (str[i] > 47 && str[i] < 58)
+			{
+				char_offset = { 48, 0 };
+				draw_str_internal(pos, str[i], char_offset);
+			}
+			break;
+		}
+		pos.x += 8;
+	}
+
+	// 0 = {16, 8}
+	// 1 = {24, 8}
+	// 2 = {32, 8}
+	// 3 = {40, 8}
+	// 4 = {48, 8}
+	// 5 = {56, 8}
+
+	// 6 = {0, 16}
+	// 7 = {8, 16}
+	// 8 = {16, 16}
+	// 9 = {24, 16}
+	// 10 = {32, 16}
+	// 11 = {40, 16}
+	// 12 = {48, 16}
+	// 13 = {56, 16}
+}
+
+void draw_uint8(u_vec2 pos, uint8_t num)
+{
+	uint8_t i = 2;
+	uint8_t buf[3] = { 255, 255, 255 };
+
+	while (num > 0)
+	{
+		uint8_t dig = num % 10;
+		buf[i] = dig;
+		num = num / 10;
+		pos.x += 8;
+		--i;
+	}
+
+	for (i = 0; i < 3; ++i)
+	{
+		if (buf[i] < 10)
+		{
+			draw_str_internal(pos, buf[i], { 0, 0 });
+			pos.x += 8;
+		}	
+	}
+}
+
+
+
+
+
+void draw_panel(u_vec2 pos, uint8_t width, uint8_t height)
+{
+	uint8_t top_bottom[3] = { 0b00111111, 0b11111111, 0b11111100 };
+	uint8_t middle[3] = { 0b01111111, 0b11111111, 0b11111110 };
+
+	for (int y = 0; y < height; ++y)
+	{
+		uint8_t data = 0b11111111;
+		uint8_t prev_data = data;
+		uint8_t carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+
+		for (int x = 0; x < width / TILE_BYTE_SIZE; ++x)
+		{
+			if (y == 0 || y == height - 1)
+			{
+				data = 0b00000000;
+			}
+			else if (y == 1 || y == height - 2)
+			{
+				if (x == 0) data = top_bottom[0];
+				else if (x == width / TILE_BYTE_SIZE - 1) data = top_bottom[2];
+				else  data = top_bottom[1];
+			}
+			else
+			{
+				if (x == 0) data = middle[0];
+				else if (x == width / TILE_BYTE_SIZE - 1) data = middle[2];
+				else  data = middle[1];
+			}
+
+			prev_data = data;
+
+			uint8_t player_data = data >> (pos.x % TILE_BYTE_SIZE) | carry_data;
+
+			render_buffer[(pos.y + y) * NUM_TILES + ((pos.x / TILE_BYTE_SIZE) + x)] = 0x00 | player_data;
+
+			carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+		}
+	}
+}
+
 void main(void)
 {
 	init();
 
+	ui_text_sprite = open_cbt_sprite("ui_text.cbt");
+
 	struct cbta_sprite player_sprite = open_cbta_sprite("big_texas_game_player.cbta");
 	player.sprite = &player_sprite;
 
-	player.pos.x = 48;
+	player.pos.x = 16;
 	player.pos.y = 72;
 
 	uint8_t bound_x_p = player.pos.x + 32;
@@ -463,7 +633,7 @@ void main(void)
 	player.bounds.max.y = player.pos.y;
 
 
-	struct cbt_sprite scene_sprite = open_cbt_sprite("big_texas_game_scene.cbt");
+	struct cbt_sprite scene_sprite = open_cbt_sprite("big_texas_game_scene_2.cbt");
 	scene.sprite = &scene_sprite;
 
 	scene.bounds.min.x = 0;
@@ -490,6 +660,14 @@ void main(void)
 		
 			draw_scene();
 			draw_player();
+
+			draw_panel({ 0, 0 }, 128, 20);
+
+			draw_str({ 8, 2 }, "HEALTH", 6);
+			draw_str({ 8, 10 }, "POINTS", 6);
+
+			draw_uint8({ 64, 2 }, 100);
+			draw_uint8({ 64, 10 }, 255);
 			
 			render_tick();
 			

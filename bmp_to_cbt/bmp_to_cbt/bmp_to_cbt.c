@@ -42,7 +42,7 @@ uint8_t reverseBits(uint8_t num)
 	return reverse_num;
 }
 
-uint8_t *invert_mirror_y(uint8_t *input, size_t size, uint8_t w, uint8_t h)
+uint8_t *invert_mirror_y(uint8_t *input, size_t size, uint32_t w, uint32_t h)
 {
 	uint8_t *reversed = malloc(size);
 	uint8_t w_f = w / (sizeof(uint8_t) * 8);
@@ -51,7 +51,7 @@ uint8_t *invert_mirror_y(uint8_t *input, size_t size, uint8_t w, uint8_t h)
 	{
 		for (int y = 0; y < h; ++y)
 		{
-			reversed[y * w_f + x] = ~input[(h - y) * w_f + x];
+			reversed[y * w_f + x] = ~input[(h - 1 - y) * w_f + x];
 		}
 	}
 	return reversed;
@@ -59,13 +59,13 @@ uint8_t *invert_mirror_y(uint8_t *input, size_t size, uint8_t w, uint8_t h)
 
 struct cbt bmp_to_cbt(char *fname)
 {
-	uint8_t head[54];
+	uint8_t head[62];
 	FILE *f = fopen(fname, "rb");
 
-	printf("file: %d", f);
+	printf("file: %s", fname);
 
 	// BMP header is 54 bytes
-	fread(head, 1, 54, f);
+	fread(head, 1, 62, f);
 
 	uint32_t w = head[18] + (((uint32_t)head[19]) << 8) + (((uint32_t)head[20]) << 16) + (((uint32_t)head[21]) << 24);
 	uint32_t h = head[22] + (((uint32_t)head[23]) << 8) + (((uint32_t)head[24]) << 16) + (((uint32_t)head[25]) << 24);
@@ -75,13 +75,6 @@ struct cbt bmp_to_cbt(char *fname)
 	uint32_t fileSize = lineSize * h;
 
 	uint8_t *data = malloc(fileSize);
-
-
-	// skip the header
-	fseek(f, 54, SEEK_SET);
-
-	// skip palette - two rgb quads, 8 bytes
-	fseek(f, 8, SEEK_CUR);
 
 	// read data
 	fread(data, 1, fileSize, f);
@@ -141,6 +134,26 @@ void main()
 	fwrite(out_img.data, sizeof(uint8_t), out_img.data_size, fp);
 	fclose(fp);
 
+	out_img = bmp_to_cbt("ui_text.bmp");
+
+	// Convert to char array for fprintf.
+	fp = fopen("ui_text.cbt", "wb");
+
+	fwrite(&out_img.width, sizeof(uint8_t), 1, fp);
+	fwrite(&out_img.height, sizeof(uint8_t), 1, fp);
+	fwrite(out_img.data, sizeof(uint8_t), out_img.data_size, fp);
+	fclose(fp);
+
+	out_img = bmp_to_cbt("big_texas_game_player.bmp");
+
+	// Convert to char array for fprintf.
+	fp = fopen("big_texas_game_player_test.cbt", "wb");
+
+	fwrite(&out_img.width, sizeof(uint8_t), 1, fp);
+	fwrite(&out_img.height, sizeof(uint8_t), 1, fp);
+	fwrite(out_img.data, sizeof(uint8_t), out_img.data_size, fp);
+	fclose(fp);
+
 	struct cbta out_img_a = bmp_to_cbta("big_texas_game_player.bmp", "big_texas_game_player_alpha.bmp");
 
 	// Convert to char array for fprintf.
@@ -151,4 +164,6 @@ void main()
 	fwrite(out_img_a.data, sizeof(uint8_t), out_img_a.data_size, fp);
 	fwrite(out_img_a.mask, sizeof(uint8_t), out_img_a.data_size, fp);
 	fclose(fp);
+
+	while (1) {}
 }
