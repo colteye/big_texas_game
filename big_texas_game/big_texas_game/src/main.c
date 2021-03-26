@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
 	GL_init();
 
-	while (is_open())
+	while (GL_is_open())
 	{
 		struct key_status_t key_s = GL_check_keys();
 		check_input(&player, &scene_buf, key_s);
