@@ -164,6 +164,4 @@ void main()
 	fwrite(out_img_a.data, sizeof(uint8_t), out_img_a.data_size, fp);
 	fwrite(out_img_a.mask, sizeof(uint8_t), out_img_a.data_size, fp);
 	fclose(fp);
-
-	while (1) {}
 }
