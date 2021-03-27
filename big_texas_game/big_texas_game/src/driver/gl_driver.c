@@ -181,8 +181,6 @@ GLuint GL_load_shader() {
 	glShaderSource(frag_shader_id, 1, &frag_shader_code, NULL);
 	glCompileShader(frag_shader_id);
 
-	// Link the program
-	printf("Linking program\n");
 	GLuint program_id = glCreateProgram();
 	glAttachShader(program_id, vert_shader_id);
 	glAttachShader(program_id, frag_shader_id);

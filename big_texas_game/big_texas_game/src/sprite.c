@@ -1,4 +1,5 @@
 #include "sprite.h"
+#include "stdlib.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4996)

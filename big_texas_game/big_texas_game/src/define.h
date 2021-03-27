@@ -29,8 +29,6 @@
 #define END_JUMP 0x20
 #define MAX_STACKED_JUMPS 2
 
-#define SHOOT_KEY VK_LBUTTON
-#define PUNCH_KEY VK_RBUTTON
 #define SPACE_KEY 0x20
 #define A_KEY 0x41
 #define D_KEY 0x44
