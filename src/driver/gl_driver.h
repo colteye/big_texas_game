@@ -6,12 +6,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-uint8_t GL_init();
+uint8_t gl_init();
 
-void GL_render(struct render_buf_t *render_buf);
+void gl_render(struct render_buf_t *render_buf);
 
-struct key_status_t GL_check_keys();
+struct key_status_t gl_check_keys();
 
-uint8_t GL_is_open();
+uint8_t gl_is_open();
+
+void gl_delay(uint32_t ms);
 
 #endif /* GL_DRIVER_H */

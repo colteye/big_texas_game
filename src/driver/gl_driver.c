@@ -1,5 +1,6 @@
 #include "gl_driver.h"
 #include <stdio.h>
+#include <time.h>
 #include "../define.h"
 
 // Global variables just to make life easier.
@@ -9,16 +10,24 @@ GLuint r_tex;
 GLuint sampler;
 GLFWwindow *window;
 
-GLuint GL_load_shader() {
+GLuint gl_load_shader() {
 
 	// Create the shaders
 	GLuint vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
 	GLuint frag_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
 	const char * vert_shader_code = 
-	"#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;layout(location = 1) in vec2 vertexUV;out vec2 UV;void main(){  gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;UV = vertexUV;}";
+	"#version 330 core\n\
+	layout(location = 0)\
+	in vec3 vertexPosition_modelspace;layout(location = 1)\
+	in vec2 vertexUV;out vec2 UV;\
+	void main(){  gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;UV = vertexUV;}";
+	
 	const char * frag_shader_code = 
-	"#version 330 core\nin vec2 UV;out vec3 color;uniform sampler2D myTextureSampler;void main() {color = texture( myTextureSampler, UV ).rgb;}";
+	"#version 330 core\n\
+	in vec2 UV;out vec3 color;\
+	uniform sampler2D myTextureSampler;\
+	void main() {color = texture( myTextureSampler, UV ).rgb;}";
 
 	glShaderSource(vert_shader_id, 1, &vert_shader_code, NULL);
 	glCompileShader(vert_shader_id);
@@ -40,7 +49,7 @@ GLuint GL_load_shader() {
 	return program_id;
 }
 
-uint8_t GL_init()
+uint8_t gl_init()
 {
 	// Decide GL+GLSL versions
 #if __APPLE__
@@ -69,7 +78,7 @@ uint8_t GL_init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(512, 512, "Big Texas", NULL, NULL);
+	window = glfwCreateWindow(768, 768, "Big Texas", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -124,14 +133,14 @@ uint8_t GL_init()
 	glBindBuffer(GL_ARRAY_BUFFER, uv_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
-	shader = GL_load_shader();
+	shader = gl_load_shader();
 
 	sampler = glGetUniformLocation(shader, "myTextureSampler");
 
 	return 1;
 }
 
-void GL_render(struct render_buf_t *render_buf)
+void gl_render(struct render_buf_t *render_buf)
 {
 	GLubyte image[HEIGHT][WIDTH][3];
 
@@ -195,23 +204,35 @@ void GL_render(struct render_buf_t *render_buf)
 	glfwPollEvents();
 }
 
-uint8_t GL_is_key_down(uint32_t keyCode)
+uint8_t gl_is_key_down(uint32_t keyCode)
 {
 	return (glfwGetKey(window, keyCode) == GLFW_PRESS);
 };
 
-struct key_status_t GL_check_keys()
+struct key_status_t gl_check_keys()
 {
 	struct key_status_t key_s;
-	key_s.left_key_s = GL_is_key_down(GLFW_KEY_A);
-	key_s.right_key_s = GL_is_key_down(GLFW_KEY_D);
-	key_s.jump_key_s = GL_is_key_down(GLFW_KEY_SPACE);
+	key_s.left_key_s = gl_is_key_down(GLFW_KEY_A);
+	key_s.right_key_s = gl_is_key_down(GLFW_KEY_D);
+	key_s.jump_key_s = gl_is_key_down(GLFW_KEY_SPACE);
 
 	return key_s;
 }
 
-uint8_t GL_is_open()
+uint8_t gl_is_open()
 {
 	return (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 		glfwWindowShouldClose(window) == 0);
+}
+
+void gl_delay(uint32_t ms)
+{
+	clock_t start = clock();
+	uint32_t elapsed_ms = 0;
+
+	while (elapsed_ms < ms)
+	{
+		clock_t end = clock();
+		elapsed_ms = (end - start);
+	}
 }

@@ -2,76 +2,99 @@
 #include <time.h>
 
 #include "scene.h"
-#include "player.h"
 #include "render.h"
+
+#include "enemy.h"
+#include "user.h"
 
 #include <stdio.h>
 #include "driver/gl_driver.h"
 
-void delay(uint32_t ms)
-{
-	clock_t start = clock();
-	uint32_t elapsed_ms = 0;
-
-	while (elapsed_ms < ms)
-	{
-		clock_t end = clock();
-		elapsed_ms = (end - start);
-	}
-}
-
 int main(void)
 {
+	// Instantiate all relevant buffers.
 	struct render_buf_t render_buf;
 	struct scene_buf_t scene_buf;
+
 	struct phys_obj_buf_t phys_obj_buf;
 	phys_obj_buf.filled = 0;
 	struct obj_buf_t obj_buf;
 	obj_buf.filled = 0;
 
-	init_render_buf(&render_buf);
+	render_buf_init(&render_buf);
 
-	struct cbt_sprite scene_sprite = open_cbt_sprite("big_texas_game_scene_2.cbt");
-	struct scene_t scene = init_scene((struct u_bounds_t){ {0, 104}, {128, 0} }, &scene_sprite);
+	// Code to initialize the scene.
+	struct cbt_sprite scene_sprite = cbt_sprite_open("big_texas_game_scene.cbt");
+	struct scene_t scene = scene_init((struct u_bounds_t) { {64, 168}, { 192, 64 } }, &scene_sprite);
+	scene_buf_init(&scene_buf, &scene);
 
-	init_scene_buf(&scene_buf, &scene);
 
-	struct cbta_sprite player_sprite = open_cbta_sprite("big_texas_game_player.cbta");
-	struct u_vec2 player_pos = { 16, 72 };
-	struct u_bounds_t player_bounds = { {player_pos.x, player_pos.y + 32 }, {player_pos.x + 32, player_pos.y} };
+	struct cbta_sprite block_sprite = cbta_sprite_open("big_texas_game_troll_block.cbta");
+	struct u_vec2 block_pos = { 112, 136 };
+	struct u_bounds_t block_bounds = { {block_pos.x, block_pos.y + 32 }, {block_pos.x + 32, block_pos.y} };
+	struct object_t *block = object_init(&obj_buf, block_pos, block_bounds, &block_sprite, COLLIDE_LAYER_4);
 
-	struct object_t *player_obj = init_obj(&obj_buf, player_pos, player_bounds, &player_sprite);
-	struct phys_object_t *player_phys_obj = init_phys_obj(&phys_obj_buf, player_obj, (struct vec2){ 0, 0 }, (struct vec2){ 0, 0 });
+	// Code to initialize the user.	
+	struct cbta_sprite user_sprite = cbta_sprite_open("big_texas_game_player.cbta");
+	struct u_vec2 user_pos = { 64, 136 };
+	struct u_bounds_t user_bounds = { {user_pos.x, user_pos.y + 32 }, {user_pos.x + 32, user_pos.y} };
 
-	struct player_t player = init_player(player_phys_obj);
+	struct object_t *user_obj = object_init(&obj_buf, user_pos, user_bounds, &user_sprite, COLLIDE_LAYER_1);
+	struct phys_object_t *user_phys_obj = phys_object_init(&phys_obj_buf, user_obj, (struct vec2) { 0, 0 }, (struct vec2) { 0, -1 });
+	struct player_t user_player = player_init(user_phys_obj);
 
-	struct cbt_sprite ui_char_sheet = open_cbt_sprite("ui_text.cbt");
+	struct user_t user = user_init(&user_player, 100);
 
-	GL_init();
+	// Code to initialize an enemy.	
+	struct cbta_sprite enemy_sprite = cbta_sprite_open("big_texas_game_enemy.cbta");
+	struct u_vec2 enemy_pos = { 160, 136 };
+	struct u_bounds_t enemy_bounds = { {enemy_pos.x, enemy_pos.y + 32 }, {enemy_pos.x + 32, enemy_pos.y} };
 
-	while (GL_is_open())
+	struct object_t *enemy_obj = object_init(&obj_buf, enemy_pos, enemy_bounds, &enemy_sprite, COLLIDE_LAYER_3);
+	struct phys_object_t *enemy_phys_obj = phys_object_init(&phys_obj_buf, enemy_obj, (struct vec2) { 0, 0 }, (struct vec2) { 0, -1 });
+	struct player_t enemy_player = player_init(enemy_phys_obj);
+
+	struct enemy_t enemy = enemy_init(&enemy_player, 100);
+	
+	// Code to initialize the UI sprites.
+	struct cbt_sprite ui_char_sheet = cbt_sprite_open("ui_text.cbt");
+
+	// Init OpenGL backend.
+	gl_init();
+
+	while (gl_is_open())
 	{
-		struct key_status_t key_s = GL_check_keys();
-		check_input(&player, &scene_buf, key_s);
+		// First check all inputs for changes.
+		struct key_status_t key_s = gl_check_keys();
+		user_move(&user, &scene_buf, &obj_buf, key_s);
+		enemy_move(&enemy);
 
-		physics_tick(&phys_obj_buf, &scene);
-		
-		draw_scene(&render_buf, &scene_buf);
+		// Once inputs are checked, run physics for the scene.
+		physics_tick(&phys_obj_buf, &obj_buf, &scene);
 
-		draw_all_obj(&render_buf, &obj_buf);
+		user_attack(&user, &enemy);
+		enemy_attack(&enemy, &user);
 
-		draw_panel(&render_buf, (struct u_vec2){ 0, 0 }, 128, 20);
+		// Draw scene first.
+		scene_buf_draw(&render_buf, &scene_buf);
 
-		draw_str(&render_buf, (struct u_vec2){ 8, 2 }, "HEALTH", 6, &ui_char_sheet);
-		draw_str(&render_buf, (struct u_vec2){ 8, 10 }, "POINTS", 6, &ui_char_sheet);
+		// Draw objects on top of scene.
+		obj_buf_draw(&render_buf, &obj_buf);
 
-		draw_uint8(&render_buf, (struct u_vec2){ 64, 2 }, player.health, &ui_char_sheet);
-		draw_uint32(&render_buf, (struct u_vec2){ 64, 10 }, player.points, &ui_char_sheet);
-		
-		GL_render(&render_buf);
+		// Draw UI on top of everything else.
+		panel_draw(&render_buf, (struct u_vec2){ 63, 64 }, 128, 20);
 
-		// delay render for this many ms.
-		delay(28);
+		string_draw(&render_buf, (struct u_vec2){ 72, 66 }, "HEALTH", 6, &ui_char_sheet);
+		string_draw(&render_buf, (struct u_vec2){ 72, 74 }, "POINTS", 6, &ui_char_sheet);
+
+		uint8_draw(&render_buf, (struct u_vec2){ 128, 66 }, user_player.health, &ui_char_sheet);
+		uint32_draw(&render_buf, (struct u_vec2){ 128, 74 }, user_player.points, &ui_char_sheet);
+
+		// After all is drawn, render.
+		gl_render(&render_buf);
+
+		// delay for consistent frame rate.
+		gl_delay(28);
 	}
 
 	return 0;

@@ -12,7 +12,8 @@ struct object_t
 	struct cbta_sprite *sprite;
 	struct u_bounds_t bounds;
 	struct u_vec2 pos;
-	uint8_t modified;
+	uint8_t collision;
+	uint8_t vis_mod_collision_mask;
 };
 
 struct obj_buf_t
@@ -21,8 +22,9 @@ struct obj_buf_t
 	uint8_t filled;
 };
 
-void move_obj(struct object_t *obj, struct vec2 *pos);
+void object_set_pos(struct object_t *obj, struct u_vec2 pos);
+void object_offset_pos(struct object_t *obj, struct vec2 offset);
 
-struct object_t *init_obj(struct obj_buf_t *obj_buf, struct u_vec2 pos, struct u_bounds_t bounds, struct cbta_sprite *sprite);
+struct object_t *object_init(struct obj_buf_t *obj_buf, struct u_vec2 pos, struct u_bounds_t bounds, struct cbta_sprite *sprite, uint8_t collidable);
 
 #endif /* OBJECT_H */

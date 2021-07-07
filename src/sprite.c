@@ -1,12 +1,12 @@
 #include "sprite.h"
 #include "stdlib.h"
+#include "error_handling.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:4996)
-#endif
-
-struct cbt_sprite open_cbt_sprite(const char *fname)
+struct cbt_sprite cbt_sprite_open(const char *fname)
 {
+	struct cbt_sprite out = { 0, 0, NULL };
+	if (is_null((char *)fname)) return out;
+
 	FILE *fp = fopen(fname, "rb");
 
 	uint8_t head[2];
@@ -18,12 +18,17 @@ struct cbt_sprite open_cbt_sprite(const char *fname)
 
 	fread(data, 1, img_size, fp);
 
-	struct cbt_sprite out = { head[0], head[1], data };
+	out.width = head[0];
+	out.height = head[1];
+	out.data = data;
 	return out;
 }
 
-struct cbta_sprite open_cbta_sprite(const char *fname)
+struct cbta_sprite cbta_sprite_open(const char *fname)
 {
+	struct cbta_sprite out = { 0, 0, NULL, NULL };
+	if (is_null((char *)fname)) return out;
+
 	FILE *fp = fopen(fname, "rb");
 
 	uint8_t head[2];
@@ -37,6 +42,9 @@ struct cbta_sprite open_cbta_sprite(const char *fname)
 	fread(data, 1, img_size, fp);
 	fread(mask, 1, img_size, fp);
 
-	struct cbta_sprite out = { head[0], head[1], data, mask };
+	out.width = head[0];
+	out.height = head[1];
+	out.data = data;
+	out.mask = mask;
 	return out;
 }

@@ -1,7 +1,11 @@
 #include "scene.h"
+#include "error_handling.h"
 
-void init_scene_buf(struct scene_buf_t *scene_buf, struct scene_t *scene)
+void scene_buf_init(struct scene_buf_t *scene_buf, struct scene_t *scene)
 {
+	if (is_null(scene_buf) || is_null(scene)) return;
+	if (is_null(scene->sprite)) return;
+
 	for (int x = 0; x < NUM_TILES; ++x)
 	{
 		for (int y = 0; y < NUM_TILES; ++y)
@@ -14,8 +18,10 @@ void init_scene_buf(struct scene_buf_t *scene_buf, struct scene_t *scene)
 	}
 }
 
-void scroll_scene_right(struct scene_buf_t *scene_buf, uint8_t pixels)
+/*void scene_scroll_right(struct scene_buf_t *scene_buf, uint8_t pixels)
 {
+	if (is_null(scene_buf)) return;
+
 	for (int y = 0; y < NUM_TILES; ++y)
 	{
 		for (int i = 0; i < TILE_BYTE_SIZE; ++i)
@@ -33,10 +39,13 @@ void scroll_scene_right(struct scene_buf_t *scene_buf, uint8_t pixels)
 			}
 		}
 	}
-}
+}*/
 
-void scroll_scene_left(struct scene_buf_t *scene_buf, uint8_t pixels)
+void scene_scroll_left(struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf, uint8_t pixels)
 {
+	if (is_null(scene_buf)) return;	
+	if (is_null(obj_buf)) return;
+
 	for (int y = 0; y < NUM_TILES; ++y)
 	{
 		for (int i = 0; i < TILE_BYTE_SIZE; ++i)
@@ -54,15 +63,28 @@ void scroll_scene_left(struct scene_buf_t *scene_buf, uint8_t pixels)
 			}
 		}
 	}
+
+	for (uint8_t i = 0; i < obj_buf->filled; ++i)
+	{
+		//	Make sure not a player using the collision layers.
+		if (!(obj_buf->buf[i].collision & COLLIDE_LAYER_1 & COLLIDE_MATRIX_MASK))
+		{
+			object_offset_pos(&obj_buf->buf[i], (struct vec2) { -pixels, 0 });
+		}
+	}
 }
 
-struct scene_t init_scene(struct u_bounds_t bounds, struct cbt_sprite *sprite)
+struct scene_t scene_init(struct u_bounds_t bounds, struct cbt_sprite *sprite)
 {
-	struct scene_t scene;
+	struct scene_t scene = { NULL, {{0, 0}, {0, 0}}, 0 };
+
+	if (is_null(sprite)) return scene;
+	if (is_null(sprite->data)) return scene;
+
 
 	scene.sprite = sprite;
 	scene.bounds = bounds;
-	scene.modified = 0x00;
+	scene.modified = 0;
 
 	return scene;
 }

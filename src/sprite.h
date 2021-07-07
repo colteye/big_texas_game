@@ -19,7 +19,7 @@ struct cbta_sprite
 	uint8_t *mask;
 };
 
-struct cbt_sprite open_cbt_sprite(const char *fname);
-struct cbta_sprite open_cbta_sprite(const char *fname);
+struct cbt_sprite cbt_sprite_open(const char *fname);
+struct cbta_sprite cbta_sprite_open(const char *fname);
 
 #endif /* SPRITE_H */
