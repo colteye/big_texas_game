@@ -12,6 +12,7 @@ struct object_t
 	struct cbta_sprite *sprite;
 	struct u_bounds_t bounds;
 	struct u_vec2 pos;
+	uint8_t y_flip;
 	uint8_t collision;
 	uint8_t vis_mod_collision_mask;
 };

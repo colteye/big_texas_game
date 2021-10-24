@@ -28,12 +28,6 @@ int main(void)
 	struct scene_t scene = scene_init((struct u_bounds_t) { {64, 168}, { 192, 64 } }, &scene_sprite);
 	scene_buf_init(&scene_buf, &scene);
 
-
-	struct cbta_sprite block_sprite = cbta_sprite_open("big_texas_game_troll_block.cbta");
-	struct u_vec2 block_pos = { 112, 136 };
-	struct u_bounds_t block_bounds = { {block_pos.x, block_pos.y + 32 }, {block_pos.x + 32, block_pos.y} };
-	struct object_t *block = object_init(&obj_buf, block_pos, block_bounds, &block_sprite, COLLIDE_LAYER_4);
-
 	// Code to initialize the user.	
 	struct cbta_sprite user_sprite = cbta_sprite_open("big_texas_game_player.cbta");
 	struct u_vec2 user_pos = { 64, 136 };
@@ -43,18 +37,18 @@ int main(void)
 	struct phys_object_t *user_phys_obj = phys_object_init(&phys_obj_buf, user_obj, (struct vec2) { 0, 0 }, (struct vec2) { 0, -1 });
 	struct player_t user_player = player_init(user_phys_obj);
 
-	struct user_t user = user_init(&user_player, 100);
+	struct user_t user = user_init(&user_player, 10);
 
 	// Code to initialize an enemy.	
 	struct cbta_sprite enemy_sprite = cbta_sprite_open("big_texas_game_enemy.cbta");
 	struct u_vec2 enemy_pos = { 160, 136 };
 	struct u_bounds_t enemy_bounds = { {enemy_pos.x, enemy_pos.y + 32 }, {enemy_pos.x + 32, enemy_pos.y} };
 
-	struct object_t *enemy_obj = object_init(&obj_buf, enemy_pos, enemy_bounds, &enemy_sprite, COLLIDE_LAYER_3);
+	struct object_t *enemy_obj = object_init(&obj_buf, enemy_pos, enemy_bounds, &enemy_sprite, COLLIDE_LAYER_1);
 	struct phys_object_t *enemy_phys_obj = phys_object_init(&phys_obj_buf, enemy_obj, (struct vec2) { 0, 0 }, (struct vec2) { 0, -1 });
 	struct player_t enemy_player = player_init(enemy_phys_obj);
 
-	struct enemy_t enemy = enemy_init(&enemy_player, 100);
+	struct enemy_t enemy = enemy_init(&enemy_player, 10);
 	
 	// Code to initialize the UI sprites.
 	struct cbt_sprite ui_char_sheet = cbt_sprite_open("ui_text.cbt");
@@ -72,7 +66,7 @@ int main(void)
 		// Once inputs are checked, run physics for the scene.
 		physics_tick(&phys_obj_buf, &obj_buf, &scene);
 
-		user_attack(&user, &enemy);
+		user_attack(&user, &enemy, key_s);
 		enemy_attack(&enemy, &user);
 
 		// Draw scene first.
@@ -82,13 +76,15 @@ int main(void)
 		obj_buf_draw(&render_buf, &obj_buf);
 
 		// Draw UI on top of everything else.
-		panel_draw(&render_buf, (struct u_vec2){ 63, 64 }, 128, 20);
+		panel_draw(&render_buf, (struct u_vec2){ 0, 0 }, 64, 12);
+		panel_draw(&render_buf, (struct u_vec2) { 64, 0 }, 64, 12);
 
-		string_draw(&render_buf, (struct u_vec2){ 72, 66 }, "HEALTH", 6, &ui_char_sheet);
-		string_draw(&render_buf, (struct u_vec2){ 72, 74 }, "POINTS", 6, &ui_char_sheet);
+		string_draw(&render_buf, (struct u_vec2){ 66, 66 }, "CBOY", 4, &ui_char_sheet);
 
-		uint8_draw(&render_buf, (struct u_vec2){ 128, 66 }, user_player.health, &ui_char_sheet);
-		uint32_draw(&render_buf, (struct u_vec2){ 128, 74 }, user_player.points, &ui_char_sheet);
+		string_draw(&render_buf, (struct u_vec2) { 130, 66 }, "TROL", 4, &ui_char_sheet);
+
+		uint8_draw(&render_buf, (struct u_vec2){ 100, 66 }, user_player.health, &ui_char_sheet);
+		uint8_draw(&render_buf, (struct u_vec2) { 164, 66 }, enemy_player.health, &ui_char_sheet);
 
 		// After all is drawn, render.
 		gl_render(&render_buf);

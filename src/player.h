@@ -27,7 +27,7 @@ struct player_t player_init(struct phys_object_t *phys_obj);
 
 void player_move_jump(struct player_t *player);
 
-void player_move_left(struct player_t *player);
+void player_move_left(struct player_t *player, struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf);
 
 void player_move_right(struct player_t *player, struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf);
 

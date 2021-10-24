@@ -58,6 +58,7 @@ struct object_t *object_init(struct obj_buf_t *obj_buf, struct u_vec2 pos, struc
 	obj.pos = pos;
 	obj.bounds = bounds;
 	obj.sprite = sprite;
+	obj.y_flip = 0;
 
 	// Collision mask system with flags.
 	obj.collision = collision_layer;

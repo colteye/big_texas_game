@@ -22,7 +22,7 @@ struct scene_buf_t
 
 void scene_buf_init(struct scene_buf_t *scene_buf, struct scene_t *scene);
 
-//void scene_scroll_right(struct scene_buf_t *scene_buf, uint8_t pixels);
+void scene_scroll_right(struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf, uint8_t pixels);
 
 void scene_scroll_left(struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf, uint8_t pixels);
 

@@ -18,9 +18,10 @@ void scene_buf_init(struct scene_buf_t *scene_buf, struct scene_t *scene)
 	}
 }
 
-/*void scene_scroll_right(struct scene_buf_t *scene_buf, uint8_t pixels)
+void scene_scroll_right(struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf, uint8_t pixels)
 {
 	if (is_null(scene_buf)) return;
+	if (is_null(obj_buf)) return;
 
 	for (int y = 0; y < NUM_TILES; ++y)
 	{
@@ -39,7 +40,7 @@ void scene_buf_init(struct scene_buf_t *scene_buf, struct scene_t *scene)
 			}
 		}
 	}
-}*/
+}
 
 void scene_scroll_left(struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf, uint8_t pixels)
 {
@@ -80,7 +81,6 @@ struct scene_t scene_init(struct u_bounds_t bounds, struct cbt_sprite *sprite)
 
 	if (is_null(sprite)) return scene;
 	if (is_null(sprite->data)) return scene;
-
 
 	scene.sprite = sprite;
 	scene.bounds = bounds;

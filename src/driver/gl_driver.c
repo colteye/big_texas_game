@@ -212,6 +212,8 @@ uint8_t gl_is_key_down(uint32_t keyCode)
 struct key_status_t gl_check_keys()
 {
 	struct key_status_t key_s;
+	key_s.attack_1_key_s = gl_is_key_down(GLFW_KEY_Q);
+	key_s.attack_2_key_s = gl_is_key_down(GLFW_KEY_W);
 	key_s.left_key_s = gl_is_key_down(GLFW_KEY_A);
 	key_s.right_key_s = gl_is_key_down(GLFW_KEY_D);
 	key_s.jump_key_s = gl_is_key_down(GLFW_KEY_SPACE);

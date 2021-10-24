@@ -52,5 +52,6 @@
 #define N_BIT(x, n) ((x >> (n)) & 0x01)
 #define IN_Y_RANGE(x) (x >= HEIGHT_OFFSET && x <= HEIGHT + HEIGHT_OFFSET)
 #define IN_X_RANGE(x) (x >= WIDTH_OFFSET && x <= WIDTH + WIDTH_OFFSET)
+#define MSB_2_LSB(b) (((b)&1?128:0)|((b)&2?64:0)|((b)&4?32:0)|((b)&8?16:0)|((b)&16?8:0)|((b)&32?4:0)|((b)&64?2:0)|((b)&128?1:0))
 
 #endif /* DEFINE_H */

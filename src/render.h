@@ -21,7 +21,9 @@ void object_draw(struct render_buf_t *render_buf, struct object_t *obj);
 
 void obj_buf_draw(struct render_buf_t *render_buf, struct obj_buf_t *obj_buf);
 
-void cbt_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct cbt_sprite *sprite, struct u_vec2 size, struct vec2 offset);
+void cbt_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct cbt_sprite *sprite, struct u_vec2 size, uint8_t use_size, uint8_t y_flip, struct vec2 offset);
+
+void cbta_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct cbta_sprite *sprite, struct u_vec2 size, uint8_t use_size, uint8_t y_flip, struct vec2 offset);
 
 void char_draw(struct render_buf_t *render_buf, struct u_vec2 pos, char ch, struct vec2 char_offset, struct cbt_sprite *ui_char_sheet);
 

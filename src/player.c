@@ -9,7 +9,6 @@ struct player_t player_init(struct phys_object_t *phys_obj)
 	// Early return if null.
 	if (is_null(phys_obj)) return player;
 
-	player.points = 0;
 	player.health = 100;	
 	player.jump_state = NOT_JUMPING;
 
@@ -55,11 +54,13 @@ void player_move_jump(struct player_t *player)
 	}
 }
 
-void player_move_left(struct player_t *player)
+void player_move_left(struct player_t *player, struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf)
 {
-	if (is_null(player)) return;
+	if (is_null(player) || is_null(scene_buf)) return;
 	if (is_null(player->phys_obj)) return;
 
+	scene_scroll_right(scene_buf, obj_buf, 1);
+	player->phys_obj->obj->y_flip = 1;
 	player->phys_obj->vel.x = -2;
 }
 
@@ -69,6 +70,7 @@ void player_move_right(struct player_t *player, struct scene_buf_t *scene_buf, s
 	if (is_null(player->phys_obj)) return;
 
 	scene_scroll_left(scene_buf, obj_buf, 1);
+	player->phys_obj->obj->y_flip = 0;
 	player->phys_obj->vel.x = 2;
 
 	// Set velocity to move to the right as long as within certain bounds. Also scroll the scene.
@@ -107,7 +109,6 @@ void player_send_damage(struct player_t *damage_send, struct player_t *damage_re
 	if (damage >= damage_recv->health)
 	{
 		damage_recv->health = 0;
-		damage_send->points += 1;
 	}
 	else damage_recv->health -= damage;
 }

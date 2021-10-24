@@ -21,7 +21,7 @@ void user_move(struct user_t *user, struct scene_buf_t *scene_buf, struct obj_bu
 	// Check keys for presses.
 	if (key_s.left_key_s)
 	{
-		player_move_left(user->player);
+		player_move_left(user->player, scene_buf, obj_buf);
 	}
 	else if (key_s.right_key_s)
 	{
@@ -38,18 +38,20 @@ void user_move(struct user_t *user, struct scene_buf_t *scene_buf, struct obj_bu
 	}
 }
 
-void user_attack(struct user_t *user, struct enemy_t *enemy)
+void user_attack(struct user_t *user, struct enemy_t *enemy, struct key_status_t key_s)
 {
 	if (is_null(user) || is_null(enemy)) return;
 	if (is_null(user->player)) return;
 	if (is_null(enemy->player)) return;
 
 	uint8_t collision = intersect_bounds(enemy->player->phys_obj->obj->bounds, user->player->phys_obj->obj->bounds);
-
 	// Only send damage if enemy is under user.
-	if (collision != user->collision_with_player)
-		if (collision == BIT1)
+	if ((collision & BIT1) || (collision & BIT2) || (collision & BIT3))
+
+		
+		if (key_s.attack_1_key_s || key_s.attack_2_key_s) {
 			player_send_damage(user->player, enemy->player, user->attack_damage);
+		}
 
 	user->collision_with_player = collision;
 }
