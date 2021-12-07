@@ -33,27 +33,27 @@ uint8_t collide_bounds(struct u_bounds_t bounds_collider, struct u_bounds_t boun
 		|| bounds_collided.min.x > bounds_collider.max.x) 
 		return 0;
 
-	if ((ABS(bounds_collided.min.x - bounds_collider.min.x)) < (bounds_collided.max.x - bounds_collided.min.x) ||
-		(ABS(bounds_collided.max.x - bounds_collider.max.x)) < (bounds_collided.max.x - bounds_collided.min.x))
+	if ((ABS(bounds_collided.min.x - bounds_collider.min.x)) <= (bounds_collided.max.x - bounds_collided.min.x) ||
+		(ABS(bounds_collided.max.x - bounds_collider.max.x)) <= (bounds_collided.max.x - bounds_collided.min.x))
 	{
-		if (bounds_collided.max.y < bounds_collider.min.y &&
-			bounds_collided.max.y < bounds_collider.max.y)
+		if (bounds_collided.max.y <= bounds_collider.min.y &&
+			bounds_collided.max.y <= bounds_collider.max.y)
 			return COLLIDE_DOWN;
 
-		if (bounds_collided.min.y < bounds_collider.max.y &&
-			bounds_collided.min.y > bounds_collider.min.y)
+		if (bounds_collided.min.y <= bounds_collider.max.y &&
+			bounds_collided.min.y >= bounds_collider.min.y)
 			return COLLIDE_UP;
 	}
 
-	if ((ABS(bounds_collided.min.y - bounds_collider.min.y)) < (bounds_collided.min.y - bounds_collided.max.y) ||
-		(ABS(bounds_collided.max.y - bounds_collider.max.y)) < (bounds_collided.min.y - bounds_collided.max.y))
+	if ((ABS(bounds_collided.min.y - bounds_collider.min.y)) <= (bounds_collided.min.y - bounds_collided.max.y) ||
+		(ABS(bounds_collided.max.y - bounds_collider.max.y)) <= (bounds_collided.min.y - bounds_collided.max.y))
 	{
-		if (bounds_collided.min.x < bounds_collider.max.x &&
-			bounds_collided.min.x > bounds_collider.min.x)
+		if (bounds_collided.min.x <= bounds_collider.max.x &&
+			bounds_collided.min.x >= bounds_collider.min.x)
 			return COLLIDE_LEFT;
 
-		if (bounds_collided.max.x > bounds_collider.min.x &&
-			bounds_collided.max.x < bounds_collider.max.x)
+		if (bounds_collided.max.x >= bounds_collider.min.x &&
+			bounds_collided.max.x <= bounds_collider.max.x)
 			return COLLIDE_RIGHT;
 	}
 	return 0;
@@ -71,19 +71,19 @@ uint8_t intersect_bounds(struct u_bounds_t bounds_collider, struct u_bounds_t bo
 	uint8_t collision = 0x00;
 
 	// Check if colliding with the top of the bounds.
-	if (bounds_collided.max.y < bounds_collider.min.y)
+	if (bounds_collided.max.y <= bounds_collider.min.y)
 		collision |= COLLIDE_UP;
 
 	// Check if colliding with the bottom of the bounds.
-	if (bounds_collided.min.y > bounds_collider.max.y)
+	if (bounds_collided.min.y >= bounds_collider.max.y)
 		collision |= COLLIDE_DOWN;
 
 	// Check if colliding with the left of the bounds.
-	if (bounds_collided.min.x < bounds_collider.max.x)
+	if (bounds_collided.min.x <= bounds_collider.max.x)
 		collision |= COLLIDE_LEFT;
 
 	// Check if colliding with the right of the bounds.
-	if (bounds_collided.max.x > bounds_collider.min.x)
+	if (bounds_collided.max.x >= bounds_collider.min.x)
 		collision |= COLLIDE_RIGHT;
 
 	return collision;

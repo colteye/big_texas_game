@@ -41,16 +41,15 @@ void object_draw(struct render_buf_t *render_buf, struct object_t *obj)
 
 	// Make sure object is visible!
 	if (!(obj->vis_mod_collision_mask & VISIBLE)) return;
+	struct u_vec2 pos = obj->pos;
 
-	//printf("pos X: %d\n", obj->pos.x);
-	cbta_sprite_draw(render_buf, obj->pos, obj->sprite, (struct u_vec2) { 0, 0 }, 0, obj->y_flip, (struct vec2) { 0, 0 });
+	cbta_sprite_draw(render_buf, pos, obj->sprite, (struct u_vec2) { 32, 32 }, 1, obj->y_flip, obj->spritesheet_offset);
+	//cbta_sprite_draw(render_buf, pos, obj->sprite, (struct u_vec2) { 0, 0 }, 0, obj->y_flip, obj->spritesheet_offset);
 }
 
 void obj_buf_draw(struct render_buf_t *render_buf, struct obj_buf_t *obj_buf)
 {
 	if (is_null(render_buf) || is_null(obj_buf)) return;
-
-	//object_draw(render_buf, &obj_buf->buf[0]);
 
 	for (uint8_t i = 0; i < obj_buf->filled; ++i)
 	{
@@ -69,7 +68,10 @@ void cbta_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct
 	if (use_size) w = size.x;
 	else w = sprite->width;
 
-	for (int y = 0; y < h; ++y)
+	// Position is in the middle of the sprite!
+	pos.x -= (w >> 1);
+
+	for (uint8_t y = 0; y < h; ++y)
 	{
 		uint8_t prev_data = 0x00;
 		uint8_t prev_mask = 0x00;
@@ -80,12 +82,12 @@ void cbta_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct
 
 		int16_t render_buf_index = 0x00;
 
-		for (int x = 0; x < w / TILE_BYTE_SIZE; ++x)
+		for (uint8_t x = 0; x < w / TILE_BYTE_SIZE; ++x)
 		{
 			if (y_flip)
 			{
-				prev_data = MSB_2_LSB(sprite->data[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (sprite->width / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
-				prev_mask = MSB_2_LSB(sprite->mask[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (sprite->width / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
+				prev_data = MSB_2_LSB(sprite->data[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (w / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
+				prev_mask = MSB_2_LSB(sprite->mask[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (w / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
 			}
 			else
 			{
@@ -99,9 +101,8 @@ void cbta_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct
 			carry_data = prev_data << (8 - (pos.x % TILE_BYTE_SIZE));
 			carry_mask = prev_mask << (8 - (pos.x % TILE_BYTE_SIZE));
 
-			//printf("rbufidx: %d\n", render_buf_index);
-			if (!IN_X_RANGE(pos.x + x * TILE_BYTE_SIZE)) {
-				++x; continue;
+			if (!IN_X_RANGE(pos.x + (x * TILE_BYTE_SIZE))) {
+				continue;
 			}
 
 			render_buf_index = (pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + x);
@@ -113,8 +114,6 @@ void cbta_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct
 		// Make sure to add a the last bit if the sprite goes over!
 		data = 0x00 | carry_data;
 		mask = 0x00 | carry_mask;
-
-		//if (!IN_X_RANGE(obj->pos.x + obj->sprite->width))  continue;
 
 		render_buf_index = (pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + w / TILE_BYTE_SIZE);
 
@@ -128,26 +127,28 @@ void cbt_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct 
 	uint8_t h = 0;
 	uint8_t w = 0;
 
+	// Position is in the middle of the sprite!
+	//pos.x -= sprite->width >> 1;
+
 	if (use_size) h = size.y;
 	else h = sprite->height;
 
 	if (use_size) w = size.x;
 	else w = sprite->width;
 
-	for (int y = 0; y < h; ++y)
+	for (uint8_t y = 0; y < h; ++y)
 	{
 		uint8_t prev_data = 0x00;
 		uint8_t carry_data = 0x00;
 		uint8_t data = 0x00;
 
 		int16_t render_buf_index = 0x00;
-
-		for (int x = 0; x < w / TILE_BYTE_SIZE; ++x)
+		for (uint8_t x = 0; x < w / TILE_BYTE_SIZE; ++x)
 		{
 
 			if (y_flip)
 			{
-				prev_data = MSB_2_LSB(sprite->data[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (sprite->width / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
+				prev_data = MSB_2_LSB(sprite->data[((y + offset.y) % sprite->height) * (sprite->width / TILE_BYTE_SIZE) + (w / TILE_BYTE_SIZE - x - 1) + (offset.x / TILE_BYTE_SIZE)]);
 			}
 			else
 			{
@@ -158,9 +159,8 @@ void cbt_sprite_draw(struct render_buf_t *render_buf, struct u_vec2 pos, struct 
 
 			carry_data = prev_data << (8 - (pos.x % TILE_BYTE_SIZE));
 
-			//printf("rbufidx: %d\n", render_buf_index);
 			if (!IN_X_RANGE(pos.x + x * TILE_BYTE_SIZE)) {
-				++x; continue;
+				continue;
 			}
 
 			render_buf_index = (pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + x);
@@ -284,7 +284,7 @@ void panel_draw(struct render_buf_t *render_buf, struct u_vec2 pos, uint8_t widt
 	{
 		uint8_t data = 0b11111111;
 		uint8_t prev_data = data;
-		uint8_t carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+		uint8_t carry_data = (prev_data << (8 - (pos.x % TILE_BYTE_SIZE)));
 
 		for (int x = 0; x < width / TILE_BYTE_SIZE; ++x)
 		{
@@ -311,72 +311,7 @@ void panel_draw(struct render_buf_t *render_buf, struct u_vec2 pos, uint8_t widt
 
 			render_buf->buf[(pos.y + y) * NUM_TILES + ((pos.x / TILE_BYTE_SIZE) + x)] = 0x00 | data;
 
-			carry_data = (prev_data << 8 - (pos.x % TILE_BYTE_SIZE));
+			carry_data = (prev_data << (8 - (pos.x % TILE_BYTE_SIZE)));
 		}
 	}
 }
-
-/*void panel_draw(struct render_buf_t *render_buf, struct u_vec2 pos, uint8_t width, uint8_t height)
-{
-	if (is_null(render_buf)) return;
-
-	uint8_t top_bottom[3] = { 0b00111111, 0b11111111, 0b11111100 };
-	uint8_t middle[3] = { 0b01111111, 0b11111111, 0b11111110 };
-
-	for (int y = 0; y < height; ++y)
-	{
-		uint8_t data = 0x00;
-		uint8_t prev_data = 0x00;
-		uint8_t carry_data = 0x00;
-
-		uint8_t mask = 0x00;
-		uint8_t prev_mask = 0x00;
-		uint8_t carry_mask = 0x00;
-
-		for (uint8_t x = 0; x < width / TILE_BYTE_SIZE; ++x)
-		{
-			if (y > 0 && y < height - 1)
-			{
-				if (y == 1 || y == height - 2)
-				{
-					if (x == 0) prev_data = top_bottom[0];
-					else if (x == width / TILE_BYTE_SIZE - 1) prev_data = top_bottom[2];
-					else  prev_data = top_bottom[1];
-				}
-				else
-				{
-					if (x == 0) prev_data = middle[0];
-					else if (x == width / TILE_BYTE_SIZE - 1) prev_data = middle[2];
-					else  prev_data = middle[1];
-				}
-			}
-
-			// Set up mask.
-			prev_mask = 0b11111111;
-
-			data = prev_data >> (pos.x % TILE_BYTE_SIZE) | carry_data;
-			mask = prev_mask >> (pos.x % TILE_BYTE_SIZE) | carry_mask;
-
-			carry_data = prev_data << (8 - (pos.x % TILE_BYTE_SIZE));
-			carry_mask = prev_mask << (8 - (pos.x % TILE_BYTE_SIZE));
-
-			if (!IN_Y_RANGE(pos.y + y * TILE_BYTE_SIZE) || !IN_X_RANGE(pos.x + x * TILE_BYTE_SIZE)) continue;
-
-			uint8_t new_x = x;
-			if (pos.x < WIDTH_OFFSET)
-				new_x = x - 1;
-
-			render_buf->buf[(pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + (new_x))] &= ~mask;
-			render_buf->buf[(pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + (new_x))] |= (data & mask);
-		}
-
-		if (pos.x < WIDTH_OFFSET)
-		{
-			data = 0x00 | carry_data;
-			mask = 0x00 | carry_mask;
-			render_buf->buf[(pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + (width / TILE_BYTE_SIZE - 1))] &= ~mask;
-			render_buf->buf[(pos.y + y - HEIGHT_OFFSET) * NUM_TILES + (((pos.x - WIDTH_OFFSET) / TILE_BYTE_SIZE) + (width / TILE_BYTE_SIZE - 1))] |= (data & mask);
-		}
-		
-	}
-}*/

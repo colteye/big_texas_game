@@ -25,4 +25,6 @@ void enemy_move(struct enemy_t *enemy);
 
 void enemy_attack(struct enemy_t *enemy, struct user_t *user);
 
+void enemy_ai(struct enemy_t *enemy, struct user_t *user, struct scene_buf_t *scene_buf, struct obj_buf_t *obj_buf);
+
 #endif /* ENEMY_H */

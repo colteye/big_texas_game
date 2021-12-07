@@ -30,6 +30,24 @@
 #define VISIBLE BIT0
 #define MODIFIED BIT1
 
+// Keys MAX = 8.
+#define JUMP_KEY BIT0
+#define LEFT_KEY BIT1
+#define RIGHT_KEY BIT2
+#define ATTACK_1_KEY BIT3
+#define ATTACK_2_KEY BIT4
+
+// Player animation indexes
+#define IDLE_ANIM_INDEX 0
+#define JUMP_ANIM_INDEX 1
+#define RUN_ANIM_INDEX 2
+#define ATTACK_ANIM_INDEX 3
+
+// Actions that can be repeated when key is pressed down.
+#define KEYS_REPEAT_ALLOWED (JUMP_KEY | LEFT_KEY | RIGHT_KEY)
+
+#define NUM_KEYS 5
+
 // Collision layer.
 #define COLLIDE_LAYER_1 BIT7 // - Player.
 #define COLLIDE_LAYER_2 BIT6
@@ -44,8 +62,9 @@
 
 #define COLLIDE_MATRIX_MASK 0b11110000 // Mask for easier usage.
 
-#define MAX_PHYS_OBJ 16
-#define MAX_OBJ 32
+#define MAX_ANIM_SYS 4
+#define MAX_PHYS_OBJ 8
+#define MAX_OBJ 16
 
 #define ABS(x) (x >= 0) ? x : -(x)
 #define ZERO_CLAMP(x) (x >= 0) ? x : 0

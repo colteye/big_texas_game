@@ -17,8 +17,8 @@ void object_offset_pos(struct object_t *obj, struct vec2 offset)
 		!IN_Y_RANGE(obj->bounds.max.y + offset.y) ||
 		!IN_Y_RANGE(obj->bounds.min.y + offset.y))
 	{
-		//set_error(ERROR_OUT_OF_BOUNDS);
-		//return;
+		set_error(ERROR_OUT_OF_BOUNDS);
+		return;
 	}
 
 	// increment object coordinates according to pos.
@@ -63,6 +63,9 @@ struct object_t *object_init(struct obj_buf_t *obj_buf, struct u_vec2 pos, struc
 	// Collision mask system with flags.
 	obj.collision = collision_layer;
 	obj.vis_mod_collision_mask = VISIBLE;
+
+	// Animation specific items
+	obj.spritesheet_offset = (struct vec2) { 0, 0 };
 
 	switch (collision_layer)
 	{
