@@ -35,7 +35,8 @@ int main(void)
 	// ----------------------------------------------------------------------------------------------------------------------------------- //
 	// -------------------------------------------------- Code to initialize the scene. -------------------------------------------------- //
 	// ----------------------------------------------------------------------------------------------------------------------------------- //
-	struct cbt_sprite scene_sprite = cbt_sprite_open("big_texas_game_scene.cbt");
+	//struct cbt_sprite scene_sprite = cbt_sprite_open("big_texas_game_scene.cbt");
+	struct cbt_sprite scene_sprite = cbt_sprite_open("big_texas_game_scene_2.cbt");
 	struct scene_t scene = scene_init((struct u_bounds_t) { {64, 168}, { 192, 64 } }, &scene_sprite);
 	scene_buf_init(&scene_buf, &scene);
 
@@ -45,7 +46,7 @@ int main(void)
 	// ----------------------------------------------------------------------------------------------------------------------------------- //
 	struct cbta_sprite user_sprite = cbta_sprite_open("user_player.cbta");
 	struct u_vec2 user_pos = { 73, 136 };
-	struct u_bounds_t user_bounds = { {user_pos.x - 8, user_pos.y + 30 }, {user_pos.x + 8, user_pos.y} };
+	struct u_bounds_t user_bounds = { {user_pos.x - 8, user_pos.y + 32 }, {user_pos.x + 8, user_pos.y} };
 
 	struct object_t *user_obj = object_init(&obj_buf, 
 											user_pos, 
@@ -88,7 +89,7 @@ int main(void)
 	// ----------------------------------------------------------------------------------------------------------------------------------- //
 	struct cbta_sprite enemy_sprite = cbta_sprite_open("user_player.cbta");
 	struct u_vec2 enemy_pos = { 184, 136 };
-	struct u_bounds_t enemy_bounds = { {enemy_pos.x - 8, enemy_pos.y + 30 }, {enemy_pos.x + 8, enemy_pos.y} };
+	struct u_bounds_t enemy_bounds = { {enemy_pos.x - 8, enemy_pos.y + 32 }, {enemy_pos.x + 8, enemy_pos.y} };
 
 	struct object_t *enemy_obj = object_init(&obj_buf, 
 											 enemy_pos, 
@@ -108,7 +109,7 @@ int main(void)
 	enemy_anim_lens[IDLE_ANIM_INDEX] = 2;
 
 	enemy_anim_starts[JUMP_ANIM_INDEX] = (struct vec2) { 64, 0 };
-	enemy_anim_lens[JUMP_ANIM_INDEX] = 1;
+	enemy_anim_lens[JUMP_ANIM_INDEX] = 2;
 
 	enemy_anim_starts[RUN_ANIM_INDEX] = (struct vec2) { 0, 32 };
 	enemy_anim_lens[RUN_ANIM_INDEX] = 4;
@@ -152,8 +153,8 @@ int main(void)
 		// First check all inputs for changes.
 		gl_check_keys(&key_s);
 		user_move(&user, &scene_buf, &obj_buf, &key_s);
-
 		user_attack(&user, &enemy, &key_s);
+
 		enemy_ai(&enemy, &user, &scene_buf, &obj_buf);
 
 		// Once inputs are checked, run physics for the scene.
@@ -176,9 +177,9 @@ int main(void)
 		panel_draw(&render_buf, (struct u_vec2){ 0, 0 }, 64, 12);
 		panel_draw(&render_buf, (struct u_vec2) { 64, 0 }, 64, 12);
 
-		string_draw(&render_buf, (struct u_vec2){ 66, 66 }, "CBOY", 4, &ui_char_sheet);
+		string_draw(&render_buf, (struct u_vec2){ 66, 66 }, "DEEZ", 4, &ui_char_sheet);
 
-		string_draw(&render_buf, (struct u_vec2) { 130, 66 }, "TROL", 4, &ui_char_sheet);
+		string_draw(&render_buf, (struct u_vec2) { 130, 66 }, "NUTZ", 4, &ui_char_sheet);
 
 		uint8_draw(&render_buf, (struct u_vec2){ 100, 66 }, user_player.health, &ui_char_sheet);
 		uint8_draw(&render_buf, (struct u_vec2) { 164, 66 }, enemy_player.health, &ui_char_sheet);

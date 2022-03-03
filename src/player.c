@@ -26,35 +26,6 @@ void player_move_jump(struct player_t *player)
 	if (is_null(player)) return;
 	if (is_null(player->phys_obj)) return;
 
-	// Check jump state.
-	/*switch (player->jump_state & 0xF0) {
-
-	// If not jumping, begin to jump.
-	case NOT_JUMPING:
-		player->phys_obj->vel.y = 7;
-		player->jump_state = (player->jump_state & 0x0F) + START_JUMP;
-		break;
-
-	// If jumping has already started, see if you can stack jumps.
-	case START_JUMP:
-		if ((player->jump_state & 0x0F) >= MAX_STACKED_JUMPS)
-		{
-			player->jump_state = END_JUMP;
-		}
-		else
-		{
-			player->jump_state = (player->jump_state & 0x0F) + NOT_JUMPING + 1;
-		}
-		break;
-
-	// If at the top or bottom of the scene, immediately stop jumping.
-	case END_JUMP:
-		if (player->phys_obj->obj->collision & COLLIDE_UP)
-		{
-			player->jump_state = NOT_JUMPING;
-		}
-		break;
-	}*/
 	if (player->jump_state == NOT_JUMPING)
 	{
 		player->phys_obj->vel.y = 8;
@@ -82,7 +53,8 @@ void player_move(struct player_t *player, struct scene_buf_t *scene_buf, struct 
 	else player->phys_obj->obj->y_flip = 0;
 	
 	player->phys_obj->vel.x = velocity;
-	//anim_sys_set_anim(player->anim_sys, RUN_ANIM_INDEX);
+
+	if (player->jump_state == NOT_JUMPING) anim_sys_set_anim(player->anim_sys, RUN_ANIM_INDEX);
 }
 
 void player_stop(struct player_t *player, uint8_t y)
