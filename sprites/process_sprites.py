@@ -14,7 +14,7 @@ asset_sprites_path = Path('./game_sprites')
 for p in raw_sprites_path.glob('**/*.bmp'):
     im = Image.open(p)
     width, height = im.size
-    im_arr = np.array(im, dtype=np.int8)
+    im_arr = np.array(im, dtype=np.uint8)
 
     # Check if file is 1 bit.
     # If so, pack bits!
@@ -27,9 +27,9 @@ for p in raw_sprites_path.glob('**/*.bmp'):
     # Check if alpha channel exists to export as cbta
     potential_alpha = raw_sprites_path / f"{p.stem}_alpha.bmp"
 
-    f.write(np.int8(potential_alpha.is_file())) # Write wether alpha enabled
-    f.write(np.int8(width)) # Width
-    f.write(np.int8(height)) # Height
+    f.write(np.uint8(potential_alpha.is_file())) # Write wether alpha enabled
+    f.write(np.uint8(width)) # Width
+    f.write(np.uint8(height)) # Height
 
     if potential_alpha.is_file():
         alpha = Image.open(potential_alpha)
@@ -40,10 +40,9 @@ for p in raw_sprites_path.glob('**/*.bmp'):
         # Write image and alpha at once.
         f.write(im_arr.tobytes())
         f.write(alpha_arr.tobytes())
-        f.close()
 
     # Write cbt without transparency.
     else:
-        f = open(asset_sprites_path / f"{p.stem}.cbt", "wb")
         f.write(im_arr.tobytes())
-        f.close()
+
+    f.close()
